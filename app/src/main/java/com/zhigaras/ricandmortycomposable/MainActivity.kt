@@ -3,18 +3,17 @@ package com.zhigaras.ricandmortycomposable
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavType
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.paging.PagingData
 import com.zhigaras.ricandmortycomposable.model.Personage
 import com.zhigaras.ricandmortycomposable.screens.DetailsScreen
@@ -28,8 +27,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        val personageViewModel: PersonageViewModel by viewModels()
-        
         setContent {
             RicAndMortyComposableTheme {
                 // A surface container using the 'background' color from the theme
@@ -37,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    RickAndMortyApp(personageViewModel.pagedPersonages)
+                    RickAndMortyApp()
                 }
             }
         }
@@ -45,20 +42,34 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun RickAndMortyApp(pagedPersonages: Flow<PagingData<Personage>>) {
+fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
     
+    val pagedPersonages = personageViewModel.pagedPersonages
     val navController = rememberNavController()
     
+    SetUpNavHost(
+        navController = navController,
+        pagedPersonages = pagedPersonages,
+    )
+    
+    
+}
+
+@Composable
+fun SetUpNavHost(
+    navController: NavHostController,
+    pagedPersonages: Flow<PagingData<Personage>>
+) {
     NavHost(
         navController = navController,
         startDestination = PersonageList.route,
-        modifier = Modifier
     ) {
         composable(route = PersonageList.route) {
             PersonageListScreen(
                 pagedPersonages = pagedPersonages,
                 onPersonageClick = { personageId ->
-                    navController.navigate("${Details.route}/$personageId") }
+                    navController.navigate("${Details.route}/$personageId")
+                }
             )
         }
         composable(
@@ -66,7 +77,7 @@ fun RickAndMortyApp(pagedPersonages: Flow<PagingData<Personage>>) {
             arguments = Details.arguments
         ) { navBackStackEntry ->
             val personageId = navBackStackEntry.arguments?.getInt(Details.personageIdArg)
-            DetailsScreen(personageId)
+            DetailsScreen(personageId!!)
         }
         composable(route = Locations.route) {
             LocationsScreen()

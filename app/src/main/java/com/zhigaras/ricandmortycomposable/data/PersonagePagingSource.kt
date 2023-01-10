@@ -6,7 +6,7 @@ import com.zhigaras.ricandmortycomposable.model.Personage
 
 class PersonagesPagingSource : PagingSource<Int, Personage>() {
     
-    private val repository = Repository()
+    private val repository = Repository
     
     override fun getRefreshKey(state: PagingState<Int, Personage>): Int = FIRST_PAGE
     
