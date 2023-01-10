@@ -1,6 +1,8 @@
 package com.zhigaras.ricandmortycomposable.data
 
-import com.zhigaras.ricandmortycomposable.model.ApiReply
+import com.zhigaras.ricandmortycomposable.model.PersonagesApiReply
+import com.zhigaras.ricandmortycomposable.model.Location
+import com.zhigaras.ricandmortycomposable.model.LocationsApiReply
 import com.zhigaras.ricandmortycomposable.model.Personage
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,12 +18,13 @@ private const val BASE_URL = "https://rickandmortyapi.com/api/"
 interface PersonagesSearchApi {
     
     @GET("character")
-    suspend fun findPersonages(
-        @Query("page") page: Int
-    ): Response<ApiReply>
+    suspend fun getPersonages(@Query("page") page: Int): Response<PersonagesApiReply>
     
     @GET("character/{id}")
     suspend fun getPersonageDetails(@Path("id") id: Int): Response<Personage>
+    
+    @GET("location")
+    suspend fun getLocations(@Query("page") page: Int): Response<LocationsApiReply>
 }
 
 object PersonagesApi {

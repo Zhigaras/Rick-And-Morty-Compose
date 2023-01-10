@@ -5,8 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -90,7 +88,7 @@ fun PersonageCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onCardClick(personage.id) }
-            .padding(4.dp),
+            .padding(4.dp)
     ) {
         Row() {
             GlideImage(model = Uri.parse(personage.image), contentDescription = null) {

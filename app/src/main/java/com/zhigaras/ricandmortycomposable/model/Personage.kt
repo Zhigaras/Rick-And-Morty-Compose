@@ -1,12 +1,9 @@
 package com.zhigaras.ricandmortycomposable.model
 
 
-import android.graphics.drawable.Drawable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.zhigaras.ricandmortycomposable.R
-import com.zhigaras.ricandmortycomposable.model.Location
-import com.zhigaras.ricandmortycomposable.model.Origin
 
 @JsonClass(generateAdapter = true)
 data class Personage(

@@ -1,17 +1,22 @@
 package com.zhigaras.ricandmortycomposable.data
 
-import com.zhigaras.ricandmortycomposable.model.ApiReply
+import com.zhigaras.ricandmortycomposable.model.PersonagesApiReply
+import com.zhigaras.ricandmortycomposable.model.Location
+import com.zhigaras.ricandmortycomposable.model.LocationsApiReply
 import com.zhigaras.ricandmortycomposable.model.Personage
 import kotlinx.coroutines.delay
 import retrofit2.Response
 
 object Repository {
-    suspend fun getPersonages(page: Int): Response<ApiReply> {
-        delay(2000)
-        return PersonagesApi.personagesSearchApi.findPersonages(page)
+    suspend fun getPersonages(page: Int): Response<PersonagesApiReply> {
+        return PersonagesApi.personagesSearchApi.getPersonages(page)
     }
     
     suspend fun getPersonageDetails(id: Int) : Response<Personage> {
         return PersonagesApi.personagesSearchApi.getPersonageDetails(id)
+    }
+    
+    suspend fun getLocations(page: Int): Response<LocationsApiReply> {
+        return PersonagesApi.personagesSearchApi.getLocations(page)
     }
 }

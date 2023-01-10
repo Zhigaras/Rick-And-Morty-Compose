@@ -12,7 +12,15 @@ object Test {
         gender = "gender",
         id = 111,
         image = "https://rickandmortyapi.com/api/character/avatar/18.jpeg",
-        location = Location(name = "locationName", "https://rickandmortyapi.com/api/location/3"),
+        location = Location(
+            name = "locationName",
+            url = "https://rickandmortyapi.com/api/location/3",
+            created = "created",
+            dimension = "dimension",
+            id = 1,
+            type = "type",
+            residents = listOf("resident1", "resident2")
+        ),
         name = "Morty Smith",
         origin = Origin("unknown", ""),
         species = "Human",
