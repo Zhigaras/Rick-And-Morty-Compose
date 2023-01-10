@@ -10,27 +10,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.PagingData
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import com.zhigaras.ricandmortycomposable.ErrorItem
 import com.zhigaras.ricandmortycomposable.LoadingItem
 import com.zhigaras.ricandmortycomposable.LoadingView
 import com.zhigaras.ricandmortycomposable.model.Location
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun LocationListScreen(
-    pagedLocations: Flow<PagingData<Location>>
+    lazyLocations: LazyPagingItems<Location>
 ) {
-    val lazyLocations = pagedLocations.collectAsLazyPagingItems()
     
     LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
-            .padding(4.dp)
+            .padding(horizontal = 8.dp)
     ) {
-        items(lazyLocations) { location ->
-            location?.let { LocationCard(location = it) }
+        
+        
+        itemsIndexed(lazyLocations) { index, location ->
+            location?.let {
+                LocationCard(
+                    location = it,
+                    modifier = Modifier.padding(top = if (index == 0) 8.dp else 0.dp)
+                )
+            }
         }
         lazyLocations.apply {
             when {
@@ -67,11 +72,13 @@ fun LocationListScreen(
 }
 
 @Composable
-fun LocationCard(location: Location) {
+fun LocationCard(
+    location: Location,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(4.dp)
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(

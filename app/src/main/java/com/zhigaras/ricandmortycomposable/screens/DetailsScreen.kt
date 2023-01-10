@@ -17,9 +17,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.zhigaras.ricandmortycomposable.LoadingView
 import com.zhigaras.ricandmortycomposable.PersonageViewModel
 import com.zhigaras.ricandmortycomposable.R
 
@@ -36,7 +36,6 @@ fun DetailsScreen(
     val isLoading = personageViewModel.isLoading.collectAsState().value
     
     Column {
-        
         
         personage?.let { it ->
             GlideImage(
@@ -57,7 +56,7 @@ fun DetailsScreen(
                 
                 Text(text = stringResource(R.string.status), style = titleTextStyle)
                 
-                Row() {
+                Row {
                     Image(
                         painter = painterResource(id = it.statusMarker),
                         contentDescription = null,

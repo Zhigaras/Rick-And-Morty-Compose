@@ -1,10 +1,8 @@
 package com.zhigaras.ricandmortycomposable.data
 
-import com.zhigaras.ricandmortycomposable.model.PersonagesApiReply
-import com.zhigaras.ricandmortycomposable.model.Location
 import com.zhigaras.ricandmortycomposable.model.LocationsApiReply
 import com.zhigaras.ricandmortycomposable.model.Personage
-import kotlinx.coroutines.delay
+import com.zhigaras.ricandmortycomposable.model.PersonagesApiReply
 import retrofit2.Response
 
 object Repository {

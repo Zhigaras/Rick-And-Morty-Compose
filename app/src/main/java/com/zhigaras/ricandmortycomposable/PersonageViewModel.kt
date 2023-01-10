@@ -46,12 +46,10 @@ class PersonageViewModel : ViewModel() {
             val result = Repository.getPersonageDetails(id)
             if (result.isSuccessful) {
                 result.body()?.let { _personageDetailsChannel.value = it }
-                _isLoading.value = false
             } else {
                 _errorChannel.send(result.message())
-                _isLoading.value = false
             }
-            
+            _isLoading.value = false
         }
     }
 }

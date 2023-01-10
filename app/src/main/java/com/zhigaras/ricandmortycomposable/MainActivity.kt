@@ -3,7 +3,6 @@ package com.zhigaras.ricandmortycomposable
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
@@ -22,12 +21,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.zhigaras.ricandmortycomposable.model.Location
 import com.zhigaras.ricandmortycomposable.model.Personage
 import com.zhigaras.ricandmortycomposable.screens.DetailsScreen
@@ -35,7 +36,6 @@ import com.zhigaras.ricandmortycomposable.screens.LocationListScreen
 import com.zhigaras.ricandmortycomposable.screens.PersonageCard
 import com.zhigaras.ricandmortycomposable.screens.PersonageListScreen
 import com.zhigaras.ricandmortycomposable.ui.theme.RicAndMortyComposableTheme
-import kotlinx.coroutines.flow.Flow
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +43,6 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             RicAndMortyComposableTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -58,9 +57,8 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
-    
-    val pagedPersonages = personageViewModel.pagedPersonages
-    val pagedLocations = personageViewModel.pagedLocations
+    val lazyPersonages = personageViewModel.pagedPersonages.collectAsLazyPagingItems()
+    val lazyLocations = personageViewModel.pagedLocations.collectAsLazyPagingItems()
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
@@ -72,7 +70,7 @@ fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
             BottomTabRow(
                 allScreens = bottomTabList,
                 onTabSelected = { newScreen ->
-                    navController.navigate(newScreen.route)
+                    navController.navigateSingleTopTo(newScreen.route)
                 },
                 currentScreen = currentScreen
             )
@@ -80,8 +78,8 @@ fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
     ) { innerPadding ->
         SetUpNavHost(
             navController = navController,
-            pagedPersonages = pagedPersonages,
-            pagedLocations = pagedLocations,
+            lazyPersonages = lazyPersonages,
+            lazyLocations = lazyLocations,
             modifier = Modifier.padding(innerPadding)
         )
     }
@@ -146,17 +144,17 @@ fun BottomTab(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.secondary
+            tint = MaterialTheme.colorScheme.onPrimary
         )
-        Text(text = text)
+        Text(text = text, color = MaterialTheme.colorScheme.onPrimary)
     }
 }
 
 @Composable
 fun SetUpNavHost(
     navController: NavHostController,
-    pagedPersonages: Flow<PagingData<Personage>>,
-    pagedLocations: Flow<PagingData<Location>>,
+    lazyPersonages: LazyPagingItems<Personage>,
+    lazyLocations: LazyPagingItems<Location>,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -166,9 +164,9 @@ fun SetUpNavHost(
     ) {
         composable(route = PersonageList.route) {
             PersonageListScreen(
-                pagedPersonages = pagedPersonages,
+                lazyPersonages = lazyPersonages,
                 onPersonageClick = { personageId ->
-                    navController.navigate("${Details.route}/$personageId")
+                    navController.navigateSingleTopTo("${Details.route}/$personageId")
                 }
             )
         }
@@ -180,10 +178,21 @@ fun SetUpNavHost(
             DetailsScreen(personageId!!)
         }
         composable(route = LocationsList.route) {
-            LocationListScreen(pagedLocations)
+            LocationListScreen(lazyLocations)
         }
     }
 }
+
+fun NavHostController.navigateSingleTopTo(route: String) =
+    this.navigate(route) {
+        popUpTo(
+            this@navigateSingleTopTo.graph.findStartDestination().id
+        ) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
 
 @Preview(showBackground = true)
 @Composable

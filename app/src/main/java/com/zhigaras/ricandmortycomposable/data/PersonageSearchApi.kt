@@ -1,7 +1,6 @@
 package com.zhigaras.ricandmortycomposable.data
 
 import com.zhigaras.ricandmortycomposable.model.PersonagesApiReply
-import com.zhigaras.ricandmortycomposable.model.Location
 import com.zhigaras.ricandmortycomposable.model.LocationsApiReply
 import com.zhigaras.ricandmortycomposable.model.Personage
 import okhttp3.OkHttpClient

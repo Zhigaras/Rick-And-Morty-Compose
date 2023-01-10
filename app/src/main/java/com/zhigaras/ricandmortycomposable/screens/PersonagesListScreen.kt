@@ -10,39 +10,40 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import com.zhigaras.ricandmortycomposable.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.PagingData
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.zhigaras.ricandmortycomposable.ErrorItem
 import com.zhigaras.ricandmortycomposable.LoadingItem
 import com.zhigaras.ricandmortycomposable.LoadingView
+import com.zhigaras.ricandmortycomposable.R
 import com.zhigaras.ricandmortycomposable.model.Personage
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun PersonageListScreen(
-    pagedPersonages: Flow<PagingData<Personage>>,
-    onPersonageClick: (Int) -> Unit = {}
+    onPersonageClick: (Int) -> Unit = {},
+    lazyPersonages: LazyPagingItems<Personage>
 ) {
-    val lazyPersonages = pagedPersonages.collectAsLazyPagingItems()
+    
     
     LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
-            .padding(4.dp)
+            .padding(horizontal = 8.dp)
     ) {
-        items(lazyPersonages) { personage ->
+        
+        itemsIndexed(lazyPersonages) { index, personage ->
             personage?.let {
                 PersonageCard(
                     personage = it,
-                    onCardClick = onPersonageClick
+                    onCardClick = onPersonageClick,
+                    modifier = Modifier.padding(top = if (index == 0) 8.dp else 0.dp)
                 )
             }
         }
@@ -82,13 +83,13 @@ fun PersonageListScreen(
 @Composable
 fun PersonageCard(
     personage: Personage,
-    onCardClick: (Int) -> Unit = {}
+    onCardClick: (Int) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onCardClick(personage.id) }
-            .padding(4.dp)
     ) {
         Row() {
             GlideImage(model = Uri.parse(personage.image), contentDescription = null) {
