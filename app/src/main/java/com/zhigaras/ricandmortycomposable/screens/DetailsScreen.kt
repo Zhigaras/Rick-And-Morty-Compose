@@ -17,10 +17,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.paging.LoadState
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.zhigaras.ricandmortycomposable.PersonageViewModel
+import com.zhigaras.ricandmortycomposable.*
 import com.zhigaras.ricandmortycomposable.R
 
 
@@ -33,54 +32,61 @@ fun DetailsScreen(
     personageViewModel.getPersonageDetails(personageId)
     
     val personage = personageViewModel.personageDetailsChannel.collectAsState().value
-    val isLoading = personageViewModel.isLoading.collectAsState().value
+    val errorChannel = personageViewModel.errorFlow.collectAsState(null).value
     
-    Column {
-        
-        personage?.let { it ->
-            GlideImage(
-                model = Uri.parse(it.image),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-            ) { requestBuilder ->
-                requestBuilder.placeholder(R.drawable.avatar_placeholder)
-            }
-            Column(Modifier.padding(start = 16.dp)) {
-                Text(
-                    text = it.name,
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-                
-                Text(text = stringResource(R.string.status), style = titleTextStyle)
-                
-                Row {
-                    Image(
-                        painter = painterResource(id = it.statusMarker),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(16.dp)
-                            .align(Alignment.CenterVertically)
-                    )
-                    Text(
-                        text = it.status,
-                        modifier = Modifier.padding(start = 8.dp),
-                        style = descTextStyle
-                    )
+    if (errorChannel != null) {
+        ErrorItem(message = errorChannel.toString(),
+            modifier = Modifier.fillMaxSize(),
+            onClickRetry = { personageViewModel.getPersonageDetails(personageId) })
+    } else {
+        Column {
+            
+            personage?.let { it ->
+                GlideImage(
+                    
+                    model = Uri.parse(it.image),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                ) { requestBuilder ->
+                    requestBuilder.placeholder(R.drawable.avatar_placeholder)
                 }
-                DetailsBlock(
-                    title = R.string.species_gender,
-                    desc = "${it.species}(${it.gender})"
-                )
-                DetailsBlock(title = R.string.origin, desc = it.origin.name)
-                DetailsBlock(title = R.string.last_location, desc = it.location.name)
+                Column(Modifier.padding(start = 16.dp)) {
+                    Text(
+                        text = it.name,
+                        style = MaterialTheme.typography.headlineLarge,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    
+                    Text(text = stringResource(R.string.status), style = titleTextStyle)
+                    
+                    Row {
+                        Image(
+                            painter = painterResource(id = it.statusMarker),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        Text(
+                            text = it.status,
+                            modifier = Modifier.padding(start = 8.dp),
+                            style = descTextStyle
+                        )
+                    }
+                    DetailsBlock(
+                        title = R.string.species_gender,
+                        desc = "${it.species}(${it.gender})"
+                    )
+                    DetailsBlock(title = R.string.origin, desc = it.origin.name)
+                    DetailsBlock(title = R.string.last_location, desc = it.location.name)
+                }
             }
         }
-        
     }
 }
+
 
 @Composable
 fun DetailsBlock(

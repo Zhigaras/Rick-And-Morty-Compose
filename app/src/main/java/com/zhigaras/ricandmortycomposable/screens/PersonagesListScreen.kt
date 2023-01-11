@@ -82,16 +82,16 @@ fun PersonageListScreen(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun PersonageCard(
+    modifier: Modifier = Modifier,
     personage: Personage,
-    onCardClick: (Int) -> Unit = {},
-    modifier: Modifier = Modifier
+    onCardClick: (Int) -> Unit = {}
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onCardClick(personage.id) }
     ) {
-        Row() {
+        Row {
             GlideImage(model = Uri.parse(personage.image), contentDescription = null) {
                 it.placeholder(R.drawable.avatar_placeholder)
             }
@@ -101,7 +101,7 @@ fun PersonageCard(
                     .fillMaxHeight()
             ) {
                 Text(text = personage.name, style = MaterialTheme.typography.titleMedium)
-                Row() {
+                Row {
                     Image(
                         painter = painterResource(id = personage.statusMarker),
                         contentDescription = null,

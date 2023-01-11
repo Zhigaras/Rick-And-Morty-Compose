@@ -3,15 +3,17 @@ package com.zhigaras.ricandmortycomposable
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,6 +59,8 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
+    
+    var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
     val lazyPersonages = personageViewModel.pagedPersonages.collectAsLazyPagingItems()
     val lazyLocations = personageViewModel.pagedLocations.collectAsLazyPagingItems()
     val navController = rememberNavController()
@@ -65,15 +69,27 @@ fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
     val currentScreen =
         bottomTabList.find { it.route == currentDestination?.route } ?: PersonageList
     
+    bottomBarState = when (currentBackStack?.destination?.route) {
+        Details.routeWithArgs -> {
+            false
+        }
+        else -> {
+            true
+        }
+    }
+    
     Scaffold(
         bottomBar = {
+//            if (currentDestination?.route != Details.route) {
             BottomTabRow(
                 allScreens = bottomTabList,
                 onTabSelected = { newScreen ->
                     navController.navigateSingleTopTo(newScreen.route)
                 },
-                currentScreen = currentScreen
+                currentScreen = currentScreen,
+                bottomBarState = bottomBarState
             )
+//            }
         }
     ) { innerPadding ->
         SetUpNavHost(
@@ -83,36 +99,40 @@ fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
             modifier = Modifier.padding(innerPadding)
         )
     }
-    
-    
 }
 
 @Composable
 fun BottomTabRow(
     allScreens: List<Destination>,
     onTabSelected: (Destination) -> Unit,
-    currentScreen: Destination
+    currentScreen: Destination,
+    bottomBarState: Boolean
 ) {
-    Surface(
-        Modifier
-            .height(56.dp)
-            .fillMaxWidth(),
-        color = MaterialTheme.colorScheme.primary
-    
+    AnimatedVisibility(
+        visible = bottomBarState,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
     ) {
-        Row(
+        Surface(
             Modifier
-                .selectableGroup()
+                .height(56.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            color = MaterialTheme.colorScheme.primary
         ) {
-            allScreens.forEach { screen ->
-                BottomTab(
-                    text = screen.route,
-                    icon = screen.icon,
-                    onSelected = { onTabSelected(screen) },
-                    selected = currentScreen == screen
-                )
+            Row(
+                Modifier
+                    .selectableGroup()
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                allScreens.forEach { screen ->
+                    BottomTab(
+                        text = screen.route,
+                        icon = screen.icon,
+                        onSelected = { onTabSelected(screen) },
+                        selected = currentScreen == screen
+                    )
+                }
             }
         }
     }
