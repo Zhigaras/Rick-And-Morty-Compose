@@ -3,10 +3,10 @@ package com.zhigaras.ricandmortycomposable.data
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.zhigaras.ricandmortycomposable.model.Location
+import javax.inject.Inject
 
-class LocationsPagingSource : PagingSource<Int, Location>() {
-    
-    private val repository = Repository
+class LocationsPagingSource @Inject constructor(private val repository: Repository) :
+    PagingSource<Int, Location>() {
     
     override fun getRefreshKey(state: PagingState<Int, Location>): Int = FIRST_PAGE
     

@@ -4,17 +4,18 @@ import com.zhigaras.ricandmortycomposable.model.LocationsApiReply
 import com.zhigaras.ricandmortycomposable.model.Personage
 import com.zhigaras.ricandmortycomposable.model.PersonagesApiReply
 import retrofit2.Response
+import javax.inject.Inject
 
-object Repository {
+class Repository @Inject constructor(private val personagesSearchApi: PersonagesSearchApi) {
     suspend fun getPersonages(page: Int): Response<PersonagesApiReply> {
-        return PersonagesApi.personagesSearchApi.getPersonages(page)
+        return personagesSearchApi.getPersonages(page)
     }
     
-    suspend fun getPersonageDetails(id: Int) : Response<Personage> {
-        return PersonagesApi.personagesSearchApi.getPersonageDetails(id)
+    suspend fun getPersonageDetails(id: Int): Response<Personage> {
+        return personagesSearchApi.getPersonageDetails(id)
     }
     
     suspend fun getLocations(page: Int): Response<LocationsApiReply> {
-        return PersonagesApi.personagesSearchApi.getLocations(page)
+        return personagesSearchApi.getLocations(page)
     }
 }

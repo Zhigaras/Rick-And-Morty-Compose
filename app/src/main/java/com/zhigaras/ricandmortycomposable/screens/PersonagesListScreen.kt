@@ -19,9 +19,9 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.zhigaras.ricandmortycomposable.ErrorItem
-import com.zhigaras.ricandmortycomposable.LoadingItem
-import com.zhigaras.ricandmortycomposable.LoadingView
+import com.zhigaras.ricandmortycomposable.ui.ErrorItem
+import com.zhigaras.ricandmortycomposable.ui.LoadingItem
+import com.zhigaras.ricandmortycomposable.ui.LoadingView
 import com.zhigaras.ricandmortycomposable.R
 import com.zhigaras.ricandmortycomposable.model.Personage
 
@@ -30,8 +30,6 @@ fun PersonageListScreen(
     onPersonageClick: (Int) -> Unit = {},
     lazyPersonages: LazyPagingItems<Personage>
 ) {
-    
-    
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier

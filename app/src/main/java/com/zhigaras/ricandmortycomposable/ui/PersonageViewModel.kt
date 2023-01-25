@@ -1,4 +1,4 @@
-package com.zhigaras.ricandmortycomposable
+package com.zhigaras.ricandmortycomposable.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,26 +11,33 @@ import com.zhigaras.ricandmortycomposable.data.PersonagesPagingSource
 import com.zhigaras.ricandmortycomposable.data.Repository
 import com.zhigaras.ricandmortycomposable.model.Location
 import com.zhigaras.ricandmortycomposable.model.Personage
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PersonageViewModel : ViewModel() {
+@HiltViewModel
+class PersonageViewModel @Inject constructor(
+    private val repository: Repository,
+    private val locationsPagingSource: LocationsPagingSource,
+    private val personagesPagingSource: PersonagesPagingSource
+) : ViewModel() {
     
     val pagedPersonages: Flow<PagingData<Personage>> = Pager(
         config = PagingConfig(20),
-        pagingSourceFactory = { PersonagesPagingSource() }
+        pagingSourceFactory = { personagesPagingSource }
     ).flow.cachedIn(viewModelScope)
     
     val pagedLocations: Flow<PagingData<Location>> = Pager(
         config = PagingConfig(20),
-        pagingSourceFactory = { LocationsPagingSource() }
+        pagingSourceFactory = { locationsPagingSource }
     ).flow.cachedIn(viewModelScope)
     
-    private val coroutineExceptionHandler = CoroutineExceptionHandler{ _, throwable ->
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         _errorFlow.value = throwable.localizedMessage
     }
     
@@ -42,7 +49,7 @@ class PersonageViewModel : ViewModel() {
     
     fun getPersonageDetails(id: Int) {
         viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-            val result = Repository.getPersonageDetails(id)
+            val result = repository.getPersonageDetails(id)
             if (result.isSuccessful) {
                 result.body()?.let { _personageDetailsChannel.value = it }
                 _errorFlow.value = null

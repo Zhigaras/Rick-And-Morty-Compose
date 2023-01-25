@@ -1,4 +1,4 @@
-package com.zhigaras.ricandmortycomposable
+package com.zhigaras.ricandmortycomposable.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -22,7 +22,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -31,6 +31,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.zhigaras.ricandmortycomposable.Test
 import com.zhigaras.ricandmortycomposable.model.Location
 import com.zhigaras.ricandmortycomposable.model.Personage
 import com.zhigaras.ricandmortycomposable.screens.DetailsScreen
@@ -38,7 +39,9 @@ import com.zhigaras.ricandmortycomposable.screens.LocationListScreen
 import com.zhigaras.ricandmortycomposable.screens.PersonageCard
 import com.zhigaras.ricandmortycomposable.screens.PersonageListScreen
 import com.zhigaras.ricandmortycomposable.ui.theme.RicAndMortyComposableTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +61,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
+fun RickAndMortyApp(personageViewModel: PersonageViewModel = hiltViewModel()) {
     
     var bottomBarState by rememberSaveable { (mutableStateOf(true)) }
     val lazyPersonages = personageViewModel.pagedPersonages.collectAsLazyPagingItems()
@@ -70,17 +73,12 @@ fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
         bottomTabList.find { it.route == currentDestination?.route } ?: PersonageList
     
     bottomBarState = when (currentBackStack?.destination?.route) {
-        Details.routeWithArgs -> {
-            false
-        }
-        else -> {
-            true
-        }
+        Details.routeWithArgs -> false
+        else -> true
     }
     
     Scaffold(
         bottomBar = {
-//            if (currentDestination?.route != Details.route) {
             BottomTabRow(
                 allScreens = bottomTabList,
                 onTabSelected = { newScreen ->
@@ -89,7 +87,6 @@ fun RickAndMortyApp(personageViewModel: PersonageViewModel = viewModel()) {
                 currentScreen = currentScreen,
                 bottomBarState = bottomBarState
             )
-//            }
         }
     ) { innerPadding ->
         SetUpNavHost(
@@ -221,5 +218,3 @@ fun DefaultPreview() {
         PersonageCard(personage = Test.testPersonage)
     }
 }
-
-val bottomTabList = listOf(PersonageList, LocationsList)

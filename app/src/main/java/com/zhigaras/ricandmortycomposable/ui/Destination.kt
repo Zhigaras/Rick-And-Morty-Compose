@@ -1,4 +1,4 @@
-package com.zhigaras.ricandmortycomposable
+package com.zhigaras.ricandmortycomposable.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -32,3 +32,5 @@ object LocationsList : Destination {
     override val route = "Locations List"
     override val icon = Icons.Filled.LocationOn
 }
+
+val bottomTabList = listOf(PersonageList, LocationsList)

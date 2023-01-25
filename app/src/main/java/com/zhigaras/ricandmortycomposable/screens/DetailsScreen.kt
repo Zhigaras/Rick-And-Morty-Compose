@@ -1,6 +1,7 @@
 package com.zhigaras.ricandmortycomposable.screens
 
 import android.net.Uri
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -16,20 +17,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.zhigaras.ricandmortycomposable.*
 import com.zhigaras.ricandmortycomposable.R
-
+import com.zhigaras.ricandmortycomposable.ui.ErrorItem
+import com.zhigaras.ricandmortycomposable.ui.PersonageViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DetailsScreen(
     personageId: Int,
-    personageViewModel: PersonageViewModel = viewModel()
+    personageViewModel: PersonageViewModel = hiltViewModel()
 ) {
     personageViewModel.getPersonageDetails(personageId)
+    Log.d("AAA", personageViewModel.hashCode().toString())
     
     val personage = personageViewModel.personageDetailsChannel.collectAsState().value
     val errorChannel = personageViewModel.errorFlow.collectAsState(null).value

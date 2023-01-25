@@ -12,9 +12,9 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemsIndexed
-import com.zhigaras.ricandmortycomposable.ErrorItem
-import com.zhigaras.ricandmortycomposable.LoadingItem
-import com.zhigaras.ricandmortycomposable.LoadingView
+import com.zhigaras.ricandmortycomposable.ui.ErrorItem
+import com.zhigaras.ricandmortycomposable.ui.LoadingItem
+import com.zhigaras.ricandmortycomposable.ui.LoadingView
 import com.zhigaras.ricandmortycomposable.model.Location
 
 @Composable
