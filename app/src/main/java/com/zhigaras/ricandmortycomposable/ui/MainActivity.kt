@@ -4,12 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -116,11 +123,14 @@ fun BottomTabRow(
                 .fillMaxWidth(),
             color = MaterialTheme.colorScheme.primary
         ) {
-            Row(
-                Modifier
+            TabRow(
+                selectedTabIndex = 0,
+                modifier = Modifier
                     .selectableGroup()
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                indicator = {tabPositions ->
+                    TabIndicator(tabPositions = tabPositions, tabPage = currentScreen)
+                }
             ) {
                 allScreens.forEach { screen ->
                     BottomTab(
@@ -142,8 +152,9 @@ fun BottomTab(
     onSelected: () -> Unit,
     selected: Boolean
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .height(56.dp)
             .selectable(
@@ -161,10 +172,58 @@ fun BottomTab(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimary
+            tint = MaterialTheme.colorScheme.primary
         )
-        Text(text = text, color = MaterialTheme.colorScheme.onPrimary)
+        Text(text = text, color = MaterialTheme.colorScheme.primary)
     }
+}
+
+@Composable
+private fun TabIndicator(
+    tabPositions: List<TabPosition>,
+    tabPage: Destination
+) {
+    val transition = updateTransition(
+        tabPage,
+        label = "Tab indicator"
+    )
+    val indicatorLeft by transition.animateDp(
+        transitionSpec = {
+            if (PersonageList isTransitioningTo LocationsList) {
+                spring(stiffness = Spring.StiffnessVeryLow)
+            } else {
+                spring(stiffness = Spring.StiffnessMedium)
+            }
+        },
+        label = "Indicator left"
+    ) { page ->
+        tabPositions[page.pageNumber].left
+    }
+    val indicatorRight by transition.animateDp(
+        transitionSpec = {
+            if (PersonageList isTransitioningTo LocationsList) {
+                spring(stiffness = Spring.StiffnessMedium)
+            } else {
+                spring(stiffness = Spring.StiffnessVeryLow)
+            }
+        },
+        label = "Indicator right"
+    ) { page ->
+        tabPositions[page.pageNumber].right
+    }
+    Box(
+        Modifier
+            .fillMaxSize()
+            .wrapContentSize(align = Alignment.BottomStart)
+            .offset(x = indicatorLeft)
+            .width(indicatorRight - indicatorLeft)
+            .padding(4.dp)
+            .fillMaxSize()
+            .border(
+                BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                RoundedCornerShape(4.dp)
+            )
+    )
 }
 
 @Composable
