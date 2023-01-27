@@ -9,11 +9,12 @@ import androidx.paging.cachedIn
 import com.zhigaras.ricandmortycomposable.data.LocationsPagingSource
 import com.zhigaras.ricandmortycomposable.data.PersonagesPagingSource
 import com.zhigaras.ricandmortycomposable.data.Repository
+import com.zhigaras.ricandmortycomposable.di.IoDispatcher
 import com.zhigaras.ricandmortycomposable.model.Location
 import com.zhigaras.ricandmortycomposable.model.Personage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +25,8 @@ import javax.inject.Inject
 class PersonageViewModel @Inject constructor(
     private val repository: Repository,
     private val locationsPagingSource: LocationsPagingSource,
-    private val personagesPagingSource: PersonagesPagingSource
+    private val personagesPagingSource: PersonagesPagingSource,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     
     val pagedPersonages: Flow<PagingData<Personage>> = Pager(
@@ -48,7 +50,7 @@ class PersonageViewModel @Inject constructor(
     val errorFlow = _errorFlow.asStateFlow()
     
     fun getPersonageDetails(id: Int) {
-        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+        viewModelScope.launch(ioDispatcher + coroutineExceptionHandler) {
             val result = repository.getPersonageDetails(id)
             if (result.isSuccessful) {
                 result.body()?.let { _personageDetailsChannel.value = it }
